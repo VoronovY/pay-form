@@ -39,13 +39,12 @@
     &[type] {
       color: #535353;
     }
-
-    &:focus {
-      border-color: #3592ff;
-    }
     &--failed {
       border-bottom: 2px solid #ff0000;
     }
+    // &:focus {
+    //   border-color: #3592ff;
+    // }
   }
   &__date-code {
     display: flex;
@@ -63,14 +62,14 @@
     line-height: 26px;
     width: 250px;
     height: 42px;
-    background: #9f9f9f;
+    background: #6cb0ff;
     border-radius: 6px;
     border: none;
-    &--disabled {
-      // background: #9f9f9f;
+    &:hover {
+      cursor: pointer;
     }
-    &--active {
-      background: #6cb0ff;
+    &:disabled {
+      background: #9f9f9f;
     }
   }
 }
@@ -84,4 +83,10 @@
 .checked {
   text-align: center;
   height: 300px;
+}
+.failed {
+  color: #ff0000;
+}
+.pay-form__input--failed {
+  border-bottom: #ff0000;
 }

@@ -33,12 +33,9 @@ export const addPidToState = (pid) => {
 
 export const isPayd = (pid) => async (dispatch) => {
   try {
-    console.log("отсылаю запрос с пид на бэк");
-
     const url = `http://localhost:2050/pay/check/${pid}`;
     const response = await fetch(url);
     const res = await response.json();
-    console.log("ответ от сервера", res);
 
     if (res.status === "ok") {
       dispatch(isPaidAC("ok"));

@@ -6,7 +6,6 @@ export default function PendingForm() {
   const pid = useSelector((state) => state.pid);
   const dispatch = useDispatch();
   useEffect(() => {
-    console.log(pid);
     const pidInterval = setInterval(() => {
       dispatch(isPayd(pid));
     }, 1000);
