@@ -8,11 +8,6 @@
   background: #ffffff;
   border-radius: 0px;
 
-  input {
-    border: none;
-    border-bottom: 1px solid #7a7a7a;
-    padding: 3px 0px;
-  }
   &__title {
     margin-top: 48px;
     margin-bottom: 36px;
@@ -32,26 +27,30 @@
     color: #9a9a9a;
   }
   &__input {
+    padding: 3px 0px;
+    border: none;
     width: 100%;
     font-size: 18px;
     line-height: 21px;
     margin-bottom: 24px;
+    border-bottom: 1px solid #3592ff;
+    color: #9a9a9a;
     &[type] {
       color: #535353;
     }
-    &--failed {
-      border-bottom: 2px solid #ff0000;
+    &[type="password"] {
+      text-align: center;
     }
-    // &:focus {
-    //   border-color: #3592ff;
-    // }
+    &--failed {
+      border-bottom: 1px solid #ff0000;
+    }
   }
   &__date-code {
     display: flex;
     justify-content: space-between;
   }
   &__month-year {
-    width: 64px;
+    width: 76px;
   }
   &__code {
     width: 80px;
@@ -70,6 +69,7 @@
     }
     &:disabled {
       background: #9f9f9f;
+      cursor: auto;
     }
   }
 }
@@ -85,8 +85,10 @@
   height: 300px;
 }
 .failed {
+  font-size: 9px;
   color: #ff0000;
-}
-.pay-form__input--failed {
-  border-bottom: #ff0000;
+  &-stars {
+    color: #ff0000;
+    font-size: 12px;
+  }
 }

@@ -2,57 +2,22 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { changeFormData } from "../../redux/actions/form";
 import { useDispatch, useSelector } from "react-redux";
+
+import {
+  isValidCardHolderFunc,
+  isValidPanFunc,
+  isValidExpireFunc,
+  isValidCvcFunc,
+} from "../../functions/validFunc";
+
+import { maskForPan, maskForExpire } from "../../functions/maskFunc";
+
 import "./PayForm.scss";
-
-const isValidPanFunc = (pan, setIsValidPanFn, setPanErr) => {
-  const regExp = /\D/g;
-  const isNotDig = regExp.test(pan);
-
-  if (pan.length < 13 || pan.length > 19 || isNotDig) {
-    setPanErr("Введите от 13 до 19 цифр");
-    if (!pan) {
-      setPanErr("Поле не может быть пустым");
-    }
-  } else {
-    setPanErr("");
-  }
-};
-
-const isValidExpireFunc = (expire, setExpireErr) => {
-  const regExp = /^(0[1-9]|1[0-2])\/2[2-6]/;
-  const isValidExpire = regExp.test(expire);
-  if (isValidExpire) {
-    setExpireErr("");
-  } else {
-    setExpireErr("Неверные данные");
-  }
-};
-
-const isValidCardHolderFunc = (cardHolder, setCardHolderErr) => {
-  const regExp = /^[A-ZА-Я]+\s[A-ZА-Я]+$/;
-  const isSpaceInCardHolder = regExp.test(cardHolder);
-  if (isSpaceInCardHolder) {
-    setCardHolderErr("");
-  } else {
-    setCardHolderErr("Введите имя и фамилию");
-  }
-};
-
-const isValidCvcFunc = (cvc, setCvcErr) => {
-  const regExp = /^\d\d\d$/;
-  const isCvcValid = regExp.test(cvc);
-  if (isCvcValid) {
-    setCvcErr("");
-  } else {
-    setCvcErr("Не верный код");
-  }
-};
 
 export default function PayForm() {
   const dispatch = useDispatch();
   const formDataInit = useSelector((state) => state.curFormData);
   const [formData, setFormData] = useState(formDataInit);
-  const [isValidPan, setIsValidPan] = useState(false);
   const [panDirty, setPanDirty] = useState(false);
   const [expireDirty, setExpireDirty] = useState(false);
   const [cardHolderDirty, setCardHolderDirty] = useState(false);
@@ -74,27 +39,6 @@ export default function PayForm() {
     }
   }, [panErr, expireErr, cardHolderErr, cvcErr]);
 
-  function maskForPan(pan) {
-    if (pan.length > 0) {
-      const res = pan
-        .replace(/\s/g, "")
-        .match(/.{1,4}/g)
-        .join(" ");
-      return res;
-    }
-  }
-
-  function maskForExpire(expire) {
-    if (expire.length > 0) {
-      const res = expire
-        .replace(/[/]/g, "")
-        .match(/.{1,2}/g)
-        .join("/")
-        .slice(0, 5);
-      return res;
-    }
-  }
-
   function onFormChange(e) {
     const keyVal = e.target.name;
     const valueVal = e.target.value;
@@ -110,7 +54,7 @@ export default function PayForm() {
       });
     } else if (keyVal === "pan") {
       const ValueWithoutSpace = valueVal.replace(/\s/g, "");
-      isValidPanFunc(ValueWithoutSpace, setIsValidPan, setPanErr);
+      isValidPanFunc(ValueWithoutSpace, setPanErr);
 
       setFormData((prev) => {
         return {
@@ -122,9 +66,11 @@ export default function PayForm() {
       switch (keyVal) {
         case "expire": {
           isValidExpireFunc(valueVal, setExpireErr);
+          break;
         }
         case "cvc": {
           isValidCvcFunc(valueVal, setCvcErr);
+          break;
         }
         default: {
           break;
@@ -171,16 +117,17 @@ export default function PayForm() {
           <label className="pay-form__label-text" htmlFor="card-number">
             Номер карты
             {panErr && panDirty ? (
-              <span className="failed">{panErr}</span>
+              <span className="failed-stars"> *1</span>
             ) : null}
           </label>
+
           <input
             name="pan"
             onBlur={blurHandler}
             onChange={onFormChange}
             value={maskForPan(formData.params.pan) || ""}
-            className={`pay-form__input ${
-              isValidPan ? "" : "pay-form__input--failed"
+            className={`pay-form__input${
+              panErr && panDirty ? " pay-form__input--failed" : ""
             }`}
             type="text"
             id="card-number"
@@ -192,7 +139,7 @@ export default function PayForm() {
             <label className="pay-form__label-text" htmlFor="month-year">
               Месяц/Год
               {expireDirty && expireErr ? (
-                <span className="failed">{expireErr}</span>
+                <span className="failed-stars"> *2</span>
               ) : null}
             </label>
             <input
@@ -200,7 +147,9 @@ export default function PayForm() {
               onBlur={blurHandler}
               onChange={onFormChange}
               value={maskForExpire(formData.params.expire) || ""}
-              className="pay-form__input"
+              className={`pay-form__input${
+                expireDirty && expireErr ? " pay-form__input--failed" : ""
+              }`}
               type="text"
               id="month-year"
               placeholder="12/25"
@@ -210,7 +159,7 @@ export default function PayForm() {
             <label className="pay-form__label-text" htmlFor="code">
               Код
               {cvcDirty && cvcErr ? (
-                <span className="failed">{cvcErr}</span>
+                <span className="failed-stars"> *3</span>
               ) : null}
             </label>
             <input
@@ -218,7 +167,9 @@ export default function PayForm() {
               onBlur={blurHandler}
               onChange={onFormChange}
               value={formData.params.cvc}
-              className="pay-form__input code"
+              className={`pay-form__input${
+                cvcDirty && cvcErr ? " pay-form__input--failed" : ""
+              }`}
               type="password"
               id="code"
               placeholder="***"
@@ -229,7 +180,7 @@ export default function PayForm() {
           <label className="pay-form__label-text" htmlFor="card-holder">
             Владелец карты
             {cardHolderErr && cardHolderDirty ? (
-              <span className="failed">{cardHolderErr}</span>
+              <span className="failed-stars"> *4</span>
             ) : null}
           </label>
           <input
@@ -237,7 +188,9 @@ export default function PayForm() {
             onBlur={blurHandler}
             onChange={onFormChange}
             value={formData.params.cardholder}
-            className="pay-form__input pay-form__input--failed"
+            className={`pay-form__input${
+              cardHolderErr && cardHolderDirty ? " pay-form__input--failed" : ""
+            }`}
             type="text"
             id="card-holder"
             placeholder="IVAN IVANOV"
@@ -254,6 +207,16 @@ export default function PayForm() {
             Оплатить
           </button>
         </Link>
+        {panErr && panDirty ? <div className="failed">*1 {panErr}</div> : null}
+        {expireDirty && expireErr ? (
+          <span className="failed">*2 {expireErr}</span>
+        ) : null}
+        {cvcDirty && cvcErr ? (
+          <span className="failed">*3 {cvcErr}</span>
+        ) : null}
+        {cardHolderErr && cardHolderDirty ? (
+          <span className="failed">*4 {cardHolderErr}</span>
+        ) : null}
       </div>
     </form>
   );
